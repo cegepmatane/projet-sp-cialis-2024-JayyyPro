@@ -22,7 +22,7 @@ var modelsToLoad = ['POC_bureau.glb'];
 modelsToLoad.forEach(function(modelFile) {
     loader.load(modelFile, function(gltf) {
         var model = gltf.scene;
-        model.position.set(Math.random(), 0, Math.random());
+        model.position.set(Math.random() * 2.5, 0, Math.random() * 2.5);
         scene.add(model);
     });
 });
