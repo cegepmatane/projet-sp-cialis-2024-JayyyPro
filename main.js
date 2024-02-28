@@ -28,10 +28,10 @@ const loadSolPromise = new Promise((resolve, reject) => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         solDimensions.push(box.getSize(new THREE.Vector3()));
-        model.position.set(
-            solDimensions[0].x / 2, 
-            0, 
-            solDimensions[0].z / 2);
+        const fixedX = solDimensions[0].x / 2;
+        const fixedY = 0;
+        const fixedZ = solDimensions[0].z / 2;
+        model.position.set(fixedX, fixedY, fixedZ);
         scene.add(model);
         resolve();
     });
@@ -44,10 +44,10 @@ const loadBureauPromise = new Promise((resolve, reject) => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         bureauDimensions.push(box.getSize(new THREE.Vector3()));
-        model.position.set(
-            random(bureauDimensions[0].x / 2, solDimensions[0].x - bureauDimensions[0].x / 2),
-            0,
-            random(bureauDimensions[0].z / 2, solDimensions[0].z - bureauDimensions[0].z / 2));
+        const randomX = random(bureauDimensions[0].x / 2, solDimensions[0].x - bureauDimensions[0].x / 2);
+        const randomZ = random(bureauDimensions[0].z / 2, solDimensions[0].z - bureauDimensions[0].z / 2);
+        model.position.set(randomX, 0, randomZ);
+
         bureauPosition.push(model.position);
         scene.add(model);
         resolve();
@@ -60,10 +60,10 @@ Promise.all([loadSolPromise, loadBureauPromise]).then(() => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         crayonDimensions.push(box.getSize(new THREE.Vector3()));
-        model.position.set(
-            random(bureauPosition[0].x - bureauDimensions[0].x / 2, bureauPosition[0].x + bureauDimensions[0].x / 2),
-            bureauDimensions[0].y + crayonDimensions[0].y,
-            random(bureauPosition[0].z - bureauDimensions[0].z / 2, bureauPosition[0].z + bureauDimensions[0].z / 2));
+        const randomX = random(bureauPosition[0].x - bureauDimensions[0].x / 2, bureauPosition[0].x + bureauDimensions[0].x / 2);
+        const fixedY = bureauDimensions[0].y + crayonDimensions[0].y;
+        const randomZ = random(bureauPosition[0].z - bureauDimensions[0].z / 2, bureauPosition[0].z + bureauDimensions[0].z / 2);
+        model.position.set(randomX, fixedY, randomZ);
         crayonPosition.push(model.position);
         scene.add(model);
     });
