@@ -61,9 +61,9 @@ Promise.all([loadSolPromise, loadBureauPromise]).then(() => {
         const box = new THREE.Box3().setFromObject(model);
         crayonDimensions.push(box.getSize(new THREE.Vector3()));
         model.position.set(
-            bureauPosition[0].x,
+            random(bureauPosition[0].x - bureauDimensions[0].x / 2, bureauPosition[0].x + bureauDimensions[0].x / 2),
             bureauDimensions[0].y + crayonDimensions[0].y,
-            bureauPosition[0].z);
+            random(bureauPosition[0].z - bureauDimensions[0].z / 2, bureauPosition[0].z + bureauDimensions[0].z / 2));
         crayonPosition.push(model.position);
         scene.add(model);
     });
