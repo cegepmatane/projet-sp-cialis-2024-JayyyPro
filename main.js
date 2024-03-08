@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 
 const scene = new THREE.Scene();
 const camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -44,8 +45,14 @@ const loadBureauPromise = new Promise((resolve, reject) => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         bureauDimensions.push(box.getSize(new THREE.Vector3()));
-        const randomX = random(bureauDimensions[0].x / 2, solDimensions[0].x - bureauDimensions[0].x / 2);
-        const randomZ = random(bureauDimensions[0].z / 2, solDimensions[0].z - bureauDimensions[0].z / 2);
+        const randomX = random(
+            bureauDimensions[0].x / 2, 
+            solDimensions[0].x - bureauDimensions[0].x / 2
+            );
+        const randomZ = random(
+            bureauDimensions[0].z / 2, 
+            solDimensions[0].z - bureauDimensions[0].z / 2
+            );
         model.position.set(randomX, 0, randomZ);
 
         bureauPosition.push(model.position);
@@ -60,27 +67,36 @@ Promise.all([loadSolPromise, loadBureauPromise]).then(() => {
         const model = gltf.scene;
         const box = new THREE.Box3().setFromObject(model);
         crayonDimensions.push(box.getSize(new THREE.Vector3()));
-        const randomX = random(bureauPosition[0].x - bureauDimensions[0].x / 2, bureauPosition[0].x + bureauDimensions[0].x / 2);
+        const randomX = random(
+            bureauPosition[0].x - bureauDimensions[0].x / 2 + crayonDimensions[0].x / 2, 
+            bureauPosition[0].x + bureauDimensions[0].x / 2 - crayonDimensions[0].x / 2
+            );
         const fixedY = bureauDimensions[0].y + crayonDimensions[0].y;
-        const randomZ = random(bureauPosition[0].z - bureauDimensions[0].z / 2, bureauPosition[0].z + bureauDimensions[0].z / 2);
+        const randomZ = random(
+            bureauPosition[0].z - bureauDimensions[0].z / 2 + crayonDimensions[0].z / 2, 
+            bureauPosition[0].z + bureauDimensions[0].z / 2 - crayonDimensions[0].z / 2
+            );
         model.position.set(randomX, fixedY, randomZ);
         crayonPosition.push(model.position);
         scene.add(model);
     });
 
+    var centreScene = new THREE.Vector3(0 + solDimensions[0].x / 2, 0, 0 + solDimensions[0].z / 2);
+    
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.target.copy(centreScene);
+
     camera.position.z = 10 + solDimensions[0].z / 2;
     camera.position.y = 5;
     camera.position.x = 0 + solDimensions[0].x / 2;
-    camera.lookAt(
-        0 + solDimensions[0].x / 2, 
-        0, 
-        0 + solDimensions[0].z / 2);
+    camera.lookAt(centreScene);
 
     const light = new THREE.AmbientLight(0xffffff, 0.5);
     scene.add(light);
 
     const animate = function () {
         requestAnimationFrame(animate);
+        controls.update();
         renderer.render(scene, camera);
     };
 
