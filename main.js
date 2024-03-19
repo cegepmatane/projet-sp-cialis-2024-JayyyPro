@@ -16,6 +16,27 @@ function random(min, max) {
     return min + Math.random() * (max - min);
 }
 
+// Function to detect the object clicked
+function onDocumentMouseDown(event) {
+    event.preventDefault();
+
+    const mouse = new THREE.Vector2();
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    const raycaster = new THREE.Raycaster();
+    raycaster.setFromCamera(mouse, camera);
+
+    const intersects = raycaster.intersectObjects(scene.children, true);
+
+    if (intersects.length > 0) {
+        if (intersects[0].object.name === "Crayon") {
+            var crayon = scene.getObjectByName("Crayon");
+            crayon.removeFromParent();
+        }
+    }
+}
+
 // Position of elements
 const bureauPosition = [];
 
@@ -98,6 +119,8 @@ Promise.all([loadSolPromise, loadBureauPromise]).then(() => {
         controls.update();
         renderer.render(scene, camera);
     };
+    
+    renderer.domElement.addEventListener('mousedown', onDocumentMouseDown, false);
 
     animate();
 });
