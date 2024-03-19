@@ -38,8 +38,6 @@ const loadSolPromise = new Promise((resolve, reject) => {
     });
 });
 
-console.log(solDimensions);
-
 const loadBureauPromise = new Promise((resolve, reject) => {
     loader.load('POC_bureau.glb', function (gltf) {
         const model = gltf.scene;
@@ -85,6 +83,7 @@ Promise.all([loadSolPromise, loadBureauPromise]).then(() => {
     
     const controls = new OrbitControls(camera, renderer.domElement);
     controls.target.copy(centreScene);
+    controls.enablePan = false;
 
     camera.position.z = 10 + solDimensions[0].z / 2;
     camera.position.y = 5;
