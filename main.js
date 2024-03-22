@@ -30,9 +30,26 @@ function onDocumentMouseDown(event) {
     const intersects = raycaster.intersectObjects(scene.children, true);
 
     if (intersects.length > 0) {
-        if (intersects[0].object.name === "Crayon") {
-            var crayon = scene.getObjectByName("Crayon");
-            crayon.removeFromParent();
+        switch (intersects[0].object.name) {
+            case "Sol":
+                console.log("Sol");
+                break;
+            case "door_001":
+                console.log("Door");
+                break;
+            case "Bureau":
+                console.log("Bureau");
+                break;
+            case "Crayon":
+                var crayon = scene.getObjectByName("Crayon");
+                crayon.removeFromParent();
+                console.log("Crayon retiré");
+                var door = scene.getObjectByName("door_001");
+                door.rotation.z = -Math.PI / 4;
+                console.log("Porte ouverte");
+                break;
+            default:
+                console.log("Unknown");
         }
     }
 }
@@ -42,6 +59,7 @@ const bureauPosition = [];
 
 // Dimensions of elements
 const solDimensions = [];
+const doorDimensions = [];
 const bureauDimensions = [];
 const crayonDimensions = [];
 
@@ -59,28 +77,45 @@ const loadSolPromise = new Promise((resolve, reject) => {
     });
 });
 
-const loadBureauPromise = new Promise((resolve, reject) => {
-    loader.load('POC_bureau.glb', function (gltf) {
-        const model = gltf.scene;
-        const box = new THREE.Box3().setFromObject(model);
-        bureauDimensions.push(box.getSize(new THREE.Vector3()));
-        const randomX = random(
-            bureauDimensions[0].x / 2, 
-            solDimensions[0].x - bureauDimensions[0].x / 2
-            );
-        const randomZ = random(
-            bureauDimensions[0].z / 2, 
-            solDimensions[0].z - bureauDimensions[0].z / 2
-            );
-        model.position.set(randomX, 0, randomZ);
-
-        bureauPosition.push(model.position);
-        scene.add(model);
-        resolve();
+loadSolPromise.then(() => {
+    const loadDoorPromise = new Promise((resolve, reject) => {
+        loader.load('PROTO_door.glb', function (gltf) {
+            const model = gltf.scene;
+            const box = new THREE.Box3().setFromObject(model);
+            doorDimensions.push(box.getSize(new THREE.Vector3()));
+            const fixedX = 0.25;
+            const fixedY = 0.1;
+            const fixedZ = solDimensions[0].z - doorDimensions[0].z / 4;
+            model.position.set(fixedX, fixedY, fixedZ);
+            scene.add(model);
+            resolve();
+        });
     });
-});
 
-Promise.all([loadSolPromise, loadBureauPromise]).then(() => {
+    return loadDoorPromise;
+}).then(() => {
+    const loadBureauPromise = new Promise((resolve, reject) => {
+        loader.load('POC_bureau.glb', function (gltf) {
+            const model = gltf.scene;
+            const box = new THREE.Box3().setFromObject(model);
+            bureauDimensions.push(box.getSize(new THREE.Vector3()));
+            const randomX = random(
+                bureauDimensions[0].x / 2, 
+                solDimensions[0].x - bureauDimensions[0].x / 2
+            );
+            const randomZ = random(
+                bureauDimensions[0].z / 2, 
+                solDimensions[0].z - bureauDimensions[0].z / 2
+            );
+            model.position.set(randomX, 0, randomZ);
+            bureauPosition.push(model.position);
+            scene.add(model);
+            resolve();
+        });
+    });
+
+    return loadBureauPromise;
+}).then(() => {
     const crayonPosition = [];
     loader.load('POC_crayon.glb', function (gltf) {
         const model = gltf.scene;
@@ -89,12 +124,12 @@ Promise.all([loadSolPromise, loadBureauPromise]).then(() => {
         const randomX = random(
             bureauPosition[0].x - bureauDimensions[0].x / 2 + crayonDimensions[0].x / 2, 
             bureauPosition[0].x + bureauDimensions[0].x / 2 - crayonDimensions[0].x / 2
-            );
+        );
         const fixedY = bureauDimensions[0].y + crayonDimensions[0].y;
         const randomZ = random(
             bureauPosition[0].z - bureauDimensions[0].z / 2 + crayonDimensions[0].z / 2, 
             bureauPosition[0].z + bureauDimensions[0].z / 2 - crayonDimensions[0].z / 2
-            );
+        );
         model.position.set(randomX, fixedY, randomZ);
         crayonPosition.push(model.position);
         scene.add(model);
