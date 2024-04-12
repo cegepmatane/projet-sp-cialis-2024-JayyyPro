@@ -1,3 +1,5 @@
-## Projet spécialisé - Julien QUELIN
+## I'm coming BOSSSSSSS - Julien QUELIN
 
-### Nom du jeu : I'm coming BOSSSSSSS
+### Installation
+
+npx vite

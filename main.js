@@ -9,6 +9,8 @@ const renderer = new THREE.WebGLRenderer();
 renderer.setSize(window.innerWidth, window.innerHeight);
 document.body.appendChild(renderer.domElement);
 
+localStorage.setItem('fin du jeu', false);
+
 const loader = new GLTFLoader();
 
 // Random function to generate a random number between two values
@@ -47,6 +49,7 @@ function onDocumentMouseDown(event) {
                 var door = scene.getObjectByName("door_001");
                 door.rotation.z = -Math.PI / 4;
                 console.log("Porte ouverte");
+                localStorage.setItem('fin du jeu', true);
                 break;
             default:
                 console.log("Unknown");
@@ -62,6 +65,7 @@ const solDimensions = [];
 const doorDimensions = [];
 const bureauDimensions = [];
 const crayonDimensions = [];
+const frameDimensions = [];
 
 const loadSolPromise = new Promise((resolve, reject) => {
     loader.load('POC_sol.glb', function (gltf) {
@@ -115,6 +119,20 @@ loadSolPromise.then(() => {
     });
 
     return loadBureauPromise;
+}).then(() => {
+    const loadFramePromise = new Promise((resolve, reject) => {
+        loader.load('FINAL_frame.glb', function (gltf) {
+            const model = gltf.scene;
+            const box = new THREE.Box3().setFromObject(model);
+            frameDimensions.push(box.getSize(new THREE.Vector3()));
+            const fixedX = solDimensions[0].x - frameDimensions[0].x / 2;
+            const fixedY = frameDimensions[0].y / 2;
+            const fixedZ = solDimensions[0].z - frameDimensions[0].z / 2;
+            model.position.set(fixedX, fixedY, fixedZ);
+            scene.add(model);
+            resolve();
+        });
+    });
 }).then(() => {
     const crayonPosition = [];
     loader.load('POC_crayon.glb', function (gltf) {
