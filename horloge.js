@@ -1,5 +1,6 @@
+var date = new Date;
+
 function initLocalClocks() {
-    var date = new Date;
     var seconds = date.getSeconds();
     var minutes = date.getMinutes();
     var hours = date.getHours();
@@ -68,6 +69,11 @@ function moveSecondHands() {
     var intervalId = setInterval(function() {
         if(localStorage.getItem('fin du jeu') === 'true') {
             clearInterval(intervalId);
+            var temps = new Date - date;
+            // Transforme le temps en minutes et en secondes
+            var minutes = Math.floor((temps / 1000) / 60);
+            var secondes = Math.floor((temps / 1000) % 60);
+            document.querySelector('.timerFin').innerHTML = 'Vous avez mis ' + minutes + ' minutes et ' + secondes + ' secondes.';
         } else {
             for (var i = 0; i < containers.length; i++) {
                 if (containers[i].angle === undefined) {
