@@ -6,3 +6,6 @@
 npm install
 npx vite
 ```
+
+### Lien vers la vidéo de présentation
+https://youtu.be/0aZ0PcFthnQ 
